@@ -56,7 +56,7 @@ const [obsError, setObsError] = useState('');
       setHealth(result);
     } catch (healthFailure) {
       setHealth(null);
-      setHealthError(healthFailure.message || 'Health check failed.');
+      setHealthError(healthFailure);
     } finally {
       setHealthLoading(false);
     }
@@ -78,7 +78,7 @@ const [obsError, setObsError] = useState('');
         .catch((telemetryFailure) => {
           if (!active) return;
           setTelemetry(null);
-          setTelemetryError(telemetryFailure.message || 'Could not load device telemetry.');
+          setTelemetryError(telemetryFailure);
         })
         .finally(() => { if (active) setTelemetryLoading(false); });
     });
@@ -97,7 +97,7 @@ const [obsError, setObsError] = useState('');
       setObsError('');
       api.getObservedConstellations(selectedId, 200)
         .then((result) => { if (active) setObservedConstellations(result); })
-        .catch((err) => { if (active) setObsError(err.message || 'Could not load observed constellations.'); })
+        .catch((err) => { if (active) setObsError(err); })
         .finally(() => { if (active) setObsLoading(false); });
     });
     return () => { cancelAnimationFrame(frame); active = false; };
@@ -136,7 +136,7 @@ const [obsError, setObsError] = useState('');
         }
       />
 
-      {error ? <ErrorBanner message={error} onRetry={refresh} /> : null}
+      {error ? <ErrorBanner message={error} onRetry={refresh} resource="diagnostics" /> : null}
 
       <InfoBanner tone="warning">
         <b>Hardware capability is unverified.</b> Constellation metadata in telemetry is receiver-reported. The console does not claim
@@ -182,7 +182,7 @@ const [obsError, setObsError] = useState('');
             {healthLoading && !health ? (
               <LoadingBlock label="Checking service health…" />
             ) : healthError ? (
-              <ErrorBanner message={healthError} onRetry={loadHealth} />
+              <ErrorBanner message={healthError} onRetry={loadHealth} resource="health status" />
             ) : (
               <>
                 <div className="diag-grid">
@@ -237,7 +237,7 @@ const [obsError, setObsError] = useState('');
             ) : telemetryLoading ? (
               <LoadingBlock label="Loading device telemetry…" />
             ) : telemetryError ? (
-              <ErrorBanner message={telemetryError} onRetry={() => setTick((value) => value + 1)} />
+              <ErrorBanner message={telemetryError} onRetry={() => setTick((value) => value + 1)} resource="device telemetry" />
             ) : latest ? (
               <div className="stack">
                 <div className="diag-grid">
@@ -328,7 +328,7 @@ const [obsError, setObsError] = useState('');
                   {obsLoading ? (
                     <LoadingBlock label="Analyzing telemetry for constellation evidence…" />
                   ) : obsError ? (
-                    <ErrorBanner message={obsError} />
+                    <ErrorBanner message={obsError} resource="observed constellations" />
                   ) : observedConstellations ? (
                     <div>
                       <div className="diag-grid" style={{ marginBottom: 12 }}>

@@ -40,7 +40,7 @@ export function SettingsPage() {
       setAudit(Array.isArray(result?.audit) ? result.audit : []);
     } catch (auditFailure) {
       setAudit([]);
-      setAuditError(auditFailure.message || 'Could not load the audit trail.');
+      setAuditError(auditFailure);
     } finally {
       setAuditLoading(false);
     }
@@ -243,7 +243,7 @@ export function SettingsPage() {
           <LoadingBlock label="Loading audit records…" />
         ) : auditError ? (
           <div style={{ padding: 16 }}>
-            <ErrorBanner message={auditError} onRetry={loadAudit} />
+            <ErrorBanner message={auditError} onRetry={loadAudit} resource="audit log" />
             <p className="small muted" style={{ lineHeight: 1.6 }}>
               The audit endpoint requires an administrator role. Other roles can use the rest of the console but cannot read audit records.
             </p>

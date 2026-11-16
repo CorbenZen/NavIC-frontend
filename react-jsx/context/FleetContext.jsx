@@ -339,7 +339,7 @@ export function FleetProvider({ enabled = true, user = null, children }) {
           lastUpdated: coreFailure ? current.lastUpdated : Date.now(),
           // Connectivity failures belong to the shell's shared offline banner;
           // retain already-loaded rows and reserve page errors for HTTP errors.
-          error: coreFailure?.reason?.status ? `HTTP ${coreFailure.reason.status}: ${coreFailure.reason.message}` : '',
+          error: coreFailure?.reason?.status ? coreFailure.reason : '',
         };
       });
     },

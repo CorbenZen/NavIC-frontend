@@ -156,7 +156,7 @@ export function LiveTracking() {
     } catch (historyFailure) {
       setHistory([]);
       setHistorySummary(null);
-      setHistoryError(historyFailure.message || 'Could not load history.');
+      setHistoryError(historyFailure);
     } finally {
       setHistoryLoading(false);
     }
@@ -271,7 +271,7 @@ export function LiveTracking() {
 
         {error ? (
           <div style={{ position: 'absolute', zIndex: 850, left: 14, top: 60, right: 14 }}>
-            <ErrorBanner message={error} onRetry={refresh} />
+            <ErrorBanner message={error} onRetry={refresh} resource="tracking data" />
           </div>
         ) : null}
 

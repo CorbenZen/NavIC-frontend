@@ -27,7 +27,7 @@ export function PublicBusShare({ token }) {
       setError('');
       setLastRefresh(new Date());
     } catch (err) {
-      setError(err.message || 'Could not load bus data.');
+      setError(err);
       setData(null);
     } finally {
       setLoading(false);
@@ -41,7 +41,7 @@ export function PublicBusShare({ token }) {
       setError('');
       setLastRefresh(new Date());
     } catch (err) {
-      setError(err.message || 'Could not refresh bus data.');
+      setError(err);
     }
   };
 
@@ -91,7 +91,7 @@ export function PublicBusShare({ token }) {
   }
 
   if (error) {
-    return <ErrorBanner message={error} onRetry={refresh} />;
+    return <ErrorBanner message={error} onRetry={refresh} resource="bus data" />;
   }
 
   if (!data) {

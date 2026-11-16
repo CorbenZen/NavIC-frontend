@@ -10,12 +10,13 @@ export const CSRF_COOKIE = 'navic_csrf';
 let sessionCsrfToken = null;
 
 export class ApiError extends Error {
-  constructor(message, { status = null, body = null, url = null } = {}) {
+  constructor(message, { status = null, body = null, url = null, referenceId = null } = {}) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.body = body;
     this.url = url;
+    this.referenceId = referenceId;
   }
 }
 
@@ -186,12 +187,13 @@ export async function apiFetch(path, options = {}) {
                 if (retryResponse.status === 404) messageRetry = detailRetry || 'The requested record or endpoint was not found.';
                 if (retryResponse.status === 405) messageRetry = detailRetry || 'Request method is not allowed for this endpoint (HTTP 405).';
                 if (retryResponse.status === 429) messageRetry = detailRetry || 'Too many requests. Wait a moment and retry.';
-                if (retryResponse.status >= 500) messageRetry = detailRetry || `Backend error (HTTP ${retryResponse.status}). Check the server logs.`;
+                if (retryResponse.status >= 500) messageRetry = 'The server could not complete this request.';
                 const isAuthRetry = path.startsWith('/auth/') || path.startsWith('/api/auth/');
                 if (retryResponse.status === 401 && !isAuthRetry) {
                   window.dispatchEvent(new CustomEvent('navic:unauthorized'));
                 }
-                throw new ApiError(messageRetry, { status: retryResponse.status, body: resultRetry, url });
+                const referenceId = retryResponse.headers.get('x-error-reference') || resultRetry?.reference_id || null;
+                throw new ApiError(messageRetry, { status: retryResponse.status, body: resultRetry, url, referenceId });
               }
               // Retry succeeded
               return resultRetry;
@@ -207,12 +209,13 @@ export async function apiFetch(path, options = {}) {
     if (response.status === 404) message = detail || 'The requested record or endpoint was not found.';
     if (response.status === 405) message = detail || 'Request method is not allowed for this endpoint (HTTP 405).';
     if (response.status === 429) message = detail || 'Too many requests. Wait a moment and retry.';
-    if (response.status >= 500) message = detail || `Backend error (HTTP ${response.status}). Check the server logs.`;
+    if (response.status >= 500) message = 'The server could not complete this request.';
     const isAuthenticationRequest = path.startsWith('/auth/') || path.startsWith('/api/auth/');
     if (response.status === 401 && !isAuthenticationRequest) {
       window.dispatchEvent(new CustomEvent('navic:unauthorized'));
     }
-    throw new ApiError(message, { status: response.status, body: result, url });
+    const referenceId = response.headers.get('x-error-reference') || result?.reference_id || null;
+    throw new ApiError(message, { status: response.status, body: result, url, referenceId });
   }
   return result;
 }

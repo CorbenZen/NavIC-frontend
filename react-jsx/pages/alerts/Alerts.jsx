@@ -54,7 +54,7 @@ export function Alerts() {
       setUnreadIncidents(Number(result?.unread_count || 0));
     } catch (loadError) {
       setIncidents([]);
-      setError(loadError.message || 'Could not load alert incidents.');
+      setError(loadError);
     } finally {
       setLoading(false);
     }
@@ -141,7 +141,7 @@ export function Alerts() {
         }
       />
 
-      {error ? <ErrorBanner message={error} onRetry={load} /> : null}
+      {error ? <ErrorBanner message={error} onRetry={load} resource="alerts" /> : null}
 
       <div className="stat-grid">
         <StatCard label="Unread incidents" value={unreadIncidents} hint="Ongoing outages needing attention" icon={Bell} tone={unreadIncidents ? 'danger' : 'slate'} />

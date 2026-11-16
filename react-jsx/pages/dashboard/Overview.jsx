@@ -79,7 +79,7 @@ export function Overview({ navigate }) {
         }
       />
 
-      {error ? <ErrorBanner message={error} onRetry={refresh} /> : null}
+      {error ? <ErrorBanner message={error} onRetry={refresh} resource="dashboard" /> : null}
 
       {hasSimulation ? (
         <div className="warn-banner">

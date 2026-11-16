@@ -97,7 +97,7 @@ export function Geofences() {
       const result = await api.getGeofenceIncidents(`?${params.toString()}`);
       setIncidents(Array.isArray(result?.incidents) ? result.incidents : []);
     } catch (err) {
-      setIncidentsError(err.message || 'Could not load incidents.');
+      setIncidentsError(err);
     } finally {
       setIncidentsLoading(false);
     }
@@ -480,7 +480,7 @@ export function Geofences() {
                 {incidentsLoading ? (
                   <LoadingBlock label="Loading incidents…" />
                 ) : incidentsError ? (
-                  <ErrorBanner message={incidentsError} onRetry={loadIncidents} />
+                  <ErrorBanner message={incidentsError} onRetry={loadIncidents} resource="geofence incidents" />
                 ) : incidents.length ? (
                   incidents.map((inc) => (
                     <div key={inc.id} className={`incident-row ${inc.is_read ? '' : 'unread'}`}>

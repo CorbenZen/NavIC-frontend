@@ -87,7 +87,7 @@ export function Reports() {
       setRows([]);
       setCount(0);
       setRules({});
-      setError(loadError.message || 'Could not run the report.');
+      setError(loadError);
     } finally {
       setLoading(false);
     }
@@ -436,7 +436,7 @@ export function Reports() {
         }
       />
 
-      {error ? <ErrorBanner message={error} onRetry={load} /> : null}
+      {error ? <ErrorBanner message={error} onRetry={load} resource="reports" /> : null}
 
       <div className="report-layout">
         <aside className="card report-menu" aria-label="Report catalogue">
@@ -447,6 +447,7 @@ export function Reports() {
                 <button
                   type="button"
                   key={item.type}
+                  data-report-type={item.type}
                   className={`report-option ${item.type === type ? 'active' : ''}`}
                   onClick={() => chooseType(item.type)}
                 >

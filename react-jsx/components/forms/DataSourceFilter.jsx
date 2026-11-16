@@ -30,6 +30,7 @@ export function rowDataSource(row) {
 
 export function matchesDataSource(row, dataSource) {
   if (!dataSource || dataSource === 'all') return true;
+  if (Array.isArray(row?.data_sources)) return row.data_sources.includes(dataSource);
   return rowDataSource(row) === dataSource;
 }
 

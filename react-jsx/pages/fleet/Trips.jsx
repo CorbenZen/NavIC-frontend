@@ -58,7 +58,7 @@ export function Trips() {
       setCount(Number(result?.count || 0));
       setRules(result?.rules || {});
     } catch (loadError) {
-      if (loadError.status) setError(`HTTP ${loadError.status}: ${loadError.message || 'Could not load trips.'}`);
+      if (loadError.status) setError(loadError);
     } finally {
       setLoading(false);
     }
@@ -141,7 +141,7 @@ export function Trips() {
         }
       />
 
-      {error ? <ErrorBanner message={error} onRetry={load} /> : null}
+      {error ? <ErrorBanner message={error} onRetry={load} resource="trips" /> : null}
 
       <InfoBanner>
         Trips are not a separately stored entity. They are recomputed from telemetry whenever this page or a report runs, so the result
@@ -208,7 +208,7 @@ export function Trips() {
                 {rows.length ? (
                   rows.map((trip) => (
                     <tr key={`${trip.device_id}-${trip.start_time}-${trip.trip}`}>
-                      <td>#{trip.trip}</td>
+                      <td>#{trip.trip} {trip.simulated ? <Badge tone="warning">Simulated</Badge> : null}</td>
                       <td>
                         <span className="primary">{trip.registration_number || trip.vehicle_id || 'Unassigned'}</span>
                         <span className="secondary mono">{trip.device_id}</span>
