@@ -3,7 +3,7 @@
 The NavIC frontend is the browser-based operations console for a college bus tracking prototype. It uses React, Vite, and Leaflet to present fleet status, live map updates, trip history, reports, and fleet management pages. The UI reads its data from the separate NavIC FastAPI backend; it does not generate fleet records itself.
 
 > **Data note:** The bundled fleet feed is simulator-backed. No IVTD hardware is connected, and simulated records are identified as such.
-
+---
 ## Requirements
 
 Node.js and npm. The backend should be running for live API data and the end-to-end smoke test.
