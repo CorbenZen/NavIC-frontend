@@ -1,0 +1,33 @@
+{
+  "name": "navic-fleet-ui",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config vite/vite.config.js --host 0.0.0.0",
+    "build": "vite build --config vite/vite.config.js",
+    "lint:undef": "eslint react-jsx --ext .jsx",
+    "check": "npm run lint:undef && npm run build",
+    "smoke": "node scripts/smoke_routes.mjs",
+    "contrast": "node scripts/check_contrast.mjs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "6.2.1",
+    "canvas": "^3.2.3",
+    "leaflet": "1.9.4",
+    "lucide-react": "1.69.0",
+    "qrcode.react": "^4.2.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-leaflet": "5.0.0",
+    "vite": "8.3.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "playwright": "^1.65.1"
+  }
+}

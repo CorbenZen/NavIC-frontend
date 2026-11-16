@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0f766e" />
+    <meta name="description" content="NavIC CBTMS — college bus tracking and fleet management console" />
+    <link rel="manifest" href="%BASE_URL%manifest.json?v=3" />
+    <link rel="icon" type="image/x-icon" href="%BASE_URL%favicon.ico?v=6" />
+    <link rel="icon" type="image/png" sizes="32x32" href="%BASE_URL%favicon-32.png?v=6" />
+    <link rel="shortcut icon" href="%BASE_URL%favicon.ico?v=6" />
+    <link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%apple-touch-icon.png?v=3" />
+    <link rel="icon" type="image/png" sizes="192x192" href="%BASE_URL%icon-192.png?v=3" />
+    <link rel="icon" type="image/png" sizes="512x512" href="%BASE_URL%icon-512.png?v=3" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="NavIC CBTMS" />
+    <title>NavIC · CBTMS</title>
+    <script>
+      (function () {
+        try {
+          var theme = localStorage.getItem('navic-theme') || 'system';
+          if (theme === 'system') theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          document.documentElement.dataset.theme = theme;
+        } catch (error) { /* The app's theme provider applies the stored theme after startup. */ }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/react-jsx/main.jsx"></script>
+  </body>
+</html>

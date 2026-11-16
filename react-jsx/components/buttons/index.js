@@ -1,0 +1,1 @@
+// Safety button removed - SOS feature removed

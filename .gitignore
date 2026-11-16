@@ -1,0 +1,65 @@
+# Python bytecode and test/tool caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage.xml
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Installed JavaScript dependencies
+node_modules/
+
+# Local editor state; keep shared launch/tasks settings
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+.idea/
+*.swp
+*~
+
+# Local logs
+*.log
+
+# Local secrets and development mail capture (contains live sign-in links)
+.env
+.env.*
+!.env.example
+dev-mail.jsonl
+dev-mail*.jsonl
+
+# Local SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Generated frontend production build
+frontend/vite/build/
+frontend/dist/
+.env
+.env.*
+!.env.example
+node_modules/
+.venv/
+venv/
+__pycache__/
+dist/
+build/
+.vite/
+backups/
+_archive/
+*.sql
+*.log
+
+# Root-level frontend build and local snapshot outputs.
+/vite/build/
+/dist/
+/backups/
+/backup/
+/.venv-local/
