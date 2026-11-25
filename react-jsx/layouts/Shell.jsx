@@ -97,7 +97,12 @@ export function Shell({ path, navigate, user, meta, onLogout, children }) {
     return () => observer.disconnect();
   }, []);
 
+  // Close the mobile drawer only when the route actually changes. Reacting to
+  // isMobileOpen itself would close the drawer the instant it opened.
+  const previousPathRef = useRef(path);
   useEffect(() => {
+    if (previousPathRef.current === path) return;
+    previousPathRef.current = path;
     if (isMobile && isMobileOpen) closeDrawer();
   }, [path, isMobile, isMobileOpen, closeDrawer]);
 
