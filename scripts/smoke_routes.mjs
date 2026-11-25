@@ -393,7 +393,7 @@ async function checkAuthScreens(browser, browserName) {
         record(dimensions.autofillStylesPresent, `${browserName} ${theme} ${path} autofill theme rules are loaded`);
         if (path === '/sign-in') {
           await page.waitForFunction(() => document.querySelector('.login-foot')?.textContent?.includes('v3.0.0 · development'));
-          record((await page.locator('.login-foot').innerText()) === 'NavIC CBTMS v3.0.0 · development', `${browserName} sign-in footer displays v3.0.0 development`);
+          record((await page.locator('.login-foot').innerText()) === 'CBTMS NavIC v3.0.0 · development', `${browserName} sign-in footer displays v3.0.0 development`);
         }
         await saveScreenshot(page, `${browserName.toLowerCase()}-${file}-${theme}-${viewport.width}x${viewport.height}.png`);
       }

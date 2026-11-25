@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import 'leaflet/dist/leaflet.css';
 import App from './App';
 import { ThemeProvider } from './context/ThemeContext';
+// Imported early so the one-shot beforeinstallprompt event is not missed.
+import './utils/installPrompt';
 
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
@@ -21,7 +23,7 @@ if ('serviceWorker' in navigator) {
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             // New version available, notify user
-            if (confirm('A new version of NavIC CBTMS is available. Reload to update?')) {
+            if (confirm('A new version of CBTMS NavIC is available. Reload to update?')) {
               window.location.reload();
             }
           }

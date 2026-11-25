@@ -1,4 +1,4 @@
-# NavIC CBTMS Frontend
+# CBTMS NavIC Frontend
 
 The NavIC frontend is the browser-based operations console for a college bus tracking prototype. It uses React, Vite, and Leaflet to present fleet status, live map updates, trip history, reports, and fleet management pages. The UI reads its data from the separate NavIC FastAPI backend; it does not generate fleet records itself.
 

@@ -29,7 +29,7 @@ export function SignUp({ meta, navigate = () => {} }) {
           </div>
         </div>
 
-        <div className="login-foot">{meta?.application || 'NavIC CBTMS'} v{meta?.version || '—'} · {meta?.environment || 'unknown environment'}</div>
+        <div className="login-foot">{meta?.application || 'CBTMS NavIC'} v{meta?.version || '—'} · {meta?.environment || 'unknown environment'}</div>
       </aside>
 
       <section className="login-panel">

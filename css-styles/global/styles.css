@@ -6181,3 +6181,11 @@ html { scrollbar-gutter: stable; }
 @media (prefers-reduced-transparency: reduce) {
   .geofences-map-view .map-toolbar { background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
+
+/* PWA install button (top bar) and iOS Add-to-Home-Screen hint. */
+.topbar-controls .install-app-btn { height: 40px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 9px; background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; white-space: nowrap; }
+.topbar-controls .install-app-btn:hover { filter: brightness(1.08); }
+@media (max-width: 640px) { .topbar-controls .install-app-btn { width: 40px; padding: 0; justify-content: center; } .install-app-label { display: none; } }
+.install-ios-hint { max-width: 260px; padding: 12px 14px; font-size: 13px; line-height: 1.45; }
+.install-ios-hint p { margin: 0; }
+.install-ios-hint svg { vertical-align: -2px; }

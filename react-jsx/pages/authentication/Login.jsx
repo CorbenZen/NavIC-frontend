@@ -42,7 +42,7 @@ export function Login({ meta, onAuthenticated, initialUserId = '', navigate = ()
         </div>
 
         <div className="login-foot">
-          {meta?.application || 'NavIC CBTMS'} v{meta?.version || '—'} · {meta?.environment || 'unknown environment'}
+          {meta?.application || 'CBTMS NavIC'} v{meta?.version || '—'} · {meta?.environment || 'unknown environment'}
         </div>
       </aside>
 

@@ -1,6 +1,6 @@
 # Contributing to NavIC (frontend + backend)
 
-NavIC CBTMS is our college bus tracking project.
+CBTMS NavIC is our college bus tracking project.
 - **NavIC-frontend**: the web app (React, Vite, Leaflet map).
 - **NavIC-backend**: the server (Python, FastAPI, PostgreSQL, and a TCP receiver for tracking devices).
 

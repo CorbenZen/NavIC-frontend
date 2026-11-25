@@ -12,6 +12,7 @@ import { selectDeviceAttention } from '../utils/deviceAttention';
 import { cx } from '../components/common';
 import { UserMenu } from '../components/navigation/AccountMenu';
 import { ThemeSelector } from '../components/navigation/ThemeSelector';
+import { InstallAppButton } from '../components/navigation/InstallAppButton';
 import { ShellTooltip } from '../components/navigation/ShellPopover';
 import { CommandPalette } from '../components/navigation/CommandPalette';
 import { Sidebar } from '../components/navigation/Sidebar';
@@ -204,6 +205,7 @@ export function Shell({ path, navigate, user, meta, onLogout, children }) {
             </div>
             <span className="topbar-divider" aria-hidden="true" />
             <div className="topbar-controls">
+              <InstallAppButton />
               <ThemeSelector />
               <SearchHintButton onClick={() => setIsCommandPaletteOpen(true)} />
               {user ? <UserMenu key={path} user={user} onLogout={onLogout} variant="topbar" /> : null}
