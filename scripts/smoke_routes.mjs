@@ -6,6 +6,7 @@
 import { mkdir } from 'node:fs/promises';
 import { chromium, firefox } from 'playwright';
 import { NAV_ITEMS } from '../react-jsx/utils/navigation.js';
+import { REPORT_CATALOG } from '../react-jsx/utils/config.js';
 
 const baseUrl = process.env.SMOKE_BASE_URL || 'http://localhost:5173';
 const userId = process.env.SMOKE_USER_ID;
@@ -15,6 +16,7 @@ const adminPassword = process.env.SMOKE_ADMIN_PASSWORD;
 const sessionToken = process.env.SMOKE_SESSION_TOKEN;
 const csrfToken = process.env.SMOKE_CSRF_TOKEN;
 const routes = NAV_ITEMS.map((item) => item.path);
+const reportTypes = REPORT_CATALOG.flatMap((group) => group.items.map((item) => item.type));
 const viewports = [
   { width: 1920, height: 1040 },
   { width: 1440, height: 900 },
@@ -23,7 +25,7 @@ const viewports = [
 ];
 const themes = ['light', 'dark'];
 const browsers = [{ name: 'Chromium', type: chromium }, { name: 'Firefox', type: firefox }];
-const screenshotDir = new URL('../../docs/screenshots/uifix5/', import.meta.url);
+const screenshotDir = new URL('../../docs/screenshots/uifix7/', import.meta.url);
 const failures = [];
 await mkdir(screenshotDir, { recursive: true });
 
@@ -35,6 +37,7 @@ function record(ok, label, details = '') {
 async function loginIfNeeded(page) {
   if (userId && password) {
     await page.goto(`${baseUrl}/sign-in`, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.login-screen', { timeout: 15000 });
     await page.getByLabel('User ID').fill(userId);
     await page.getByLabel('Password').first().fill(password);
     await page.getByRole('button', { name: /sign in/i }).click();
@@ -286,8 +289,9 @@ async function checkBackendRecovery(browser, browserName) {
     const page = await context.newPage();
     if (userId && password) {
       await page.goto(`${origin}/sign-in`, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('.login-screen', { timeout: 15000 });
       await page.getByLabel('User ID').fill(userId);
-      await page.getByLabel('Password').fill(password);
+      await page.getByLabel('Password').first().fill(password);
       await page.getByRole('button', { name: /sign in/i }).click();
       await page.waitForSelector('#primary-navigation', { timeout: 15000 });
     } else if (sessionToken && csrfToken) {
@@ -309,17 +313,61 @@ async function checkBackendRecovery(browser, browserName) {
   }
 }
 
+async function checkReportsWithLiveSimulation(browser, browserName) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
+  let simulationStarted = false;
+  try {
+    await page.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#primary-navigation', { timeout: 15000 });
+    const started = await context.request.post(`${baseUrl}/api/admin/demo/simulation/start`, { data: { speed_multiplier: 4 } });
+    record(started.status() === 200, `${browserName} starts demo simulation at 4x`, `status=${started.status()}`);
+    if (started.status() !== 200) return;
+    simulationStarted = true;
+
+    // The long wait lets moving, idle, stopped and outage phases persist through the real telemetry path.
+    await page.waitForTimeout(60000);
+    const tripsResponse = await context.request.get(`${baseUrl}/trips?limit=100&offset=0`);
+    record(tripsResponse.ok(), `${browserName} trips endpoint returns while demo runs`, `status=${tripsResponse.status()}`);
+    await page.goto(`${baseUrl}/trips`, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#primary-navigation', { timeout: 15000 });
+    await page.waitForTimeout(300);
+    record(await page.locator('.error-banner').count() === 0, `${browserName} Trip history has no error banner with demo running`);
+    record(await page.getByText('Simulated', { exact: true }).count() > 0, `${browserName} persisted demo trips carry a Simulated badge`);
+
+    await page.goto(`${baseUrl}/reports`, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.report-menu', { timeout: 15000 });
+    for (const type of reportTypes) {
+      const response = await context.request.get(`${baseUrl}/api/reports/${type}?limit=100&offset=0`);
+      record(response.status() < 500, `${browserName} /reports ${type} while demo runs`, `status=${response.status()}`);
+      await page.locator(`.report-option[data-report-type="${type}"]`).click();
+      await page.waitForTimeout(120);
+      record(await page.locator('.error-banner').count() === 0, `${browserName} report ${type} renders without an error banner`);
+    }
+  } finally {
+    const stopped = simulationStarted
+      ? await context.request.post(`${baseUrl}/api/admin/demo/simulation/stop`).catch(() => null)
+      : null;
+    if (stopped) record(stopped.status() === 200, `${browserName} stops demo simulation after report sweep`, `status=${stopped.status()}`);
+    await context.close();
+  }
+}
+
 async function checkAuthScreens(browser, browserName) {
-  const context = await browser.newContext({ viewport: { width: 1920, height: 1040 } });
+  const context = await browser.newContext({ viewport: { width: 1920, height: 990 } });
   const page = await context.newPage();
   for (const theme of themes) {
-    await page.setViewportSize({ width: 1920, height: 1040 });
+    await page.setViewportSize({ width: 1920, height: 990 });
     await page.goto(`${baseUrl}/sign-in`, { waitUntil: 'domcontentloaded' });
     await page.evaluate((mode) => localStorage.setItem('navic-theme', mode), theme);
     await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.login-screen', { timeout: 15000 });
     for (const [path, file] of [['/sign-in', 'sign-in'], ['/sign-up', 'sign-up']]) {
-      if (path !== '/sign-in') await page.goto(`${baseUrl}${path}`, { waitUntil: 'domcontentloaded' });
-      for (const viewport of [{ width: 1920, height: 1040 }, { width: 390, height: 844 }]) {
+      if (path !== '/sign-in') {
+        await page.goto(`${baseUrl}${path}`, { waitUntil: 'domcontentloaded' });
+        await page.waitForSelector('.login-screen', { timeout: 15000 });
+      }
+      for (const viewport of [{ width: 1920, height: 990 }, { width: 390, height: 844 }]) {
         await page.setViewportSize(viewport);
         await page.waitForTimeout(60);
         const dimensions = await page.evaluate(() => {
@@ -329,20 +377,27 @@ async function checkAuthScreens(browser, browserName) {
           const cssText = [...document.styleSheets].map((sheet) => {
             try { return [...sheet.cssRules].map((rule) => rule.cssText).join(''); } catch { return ''; }
           }).join('');
+          // Browsers drop unknown vendor pseudo-elements from parsed rules, so
+          // also read the raw style text Vite injects in development.
+          const rawCss = [...document.querySelectorAll('style')].map((node) => node.textContent).join('');
           return {
             screen: Boolean(screen), card: Boolean(card),
             noHorizontalScroll: document.documentElement.scrollWidth <= innerWidth + 1,
             cardWithinScrollHeight: card ? card.getBoundingClientRect().bottom <= Math.max(innerHeight, document.documentElement.scrollHeight) + 1 : false,
             glass: style?.backdropFilter || 'none',
-            autofillStylesPresent: cssText.includes(':-webkit-autofill') && cssText.includes(':-moz-autofill'),
+            autofillStylesPresent: (cssText + rawCss).includes(':-webkit-autofill') && (cssText + rawCss).includes(':-moz-autofill'),
           };
         });
         record(dimensions.screen && dimensions.card && dimensions.noHorizontalScroll && dimensions.cardWithinScrollHeight,
           `${browserName} ${theme} ${path} auth layout ${viewport.width}x${viewport.height}`, JSON.stringify(dimensions));
         record(dimensions.autofillStylesPresent, `${browserName} ${theme} ${path} autofill theme rules are loaded`);
-        if (viewport.width === 1920) await saveScreenshot(page, `${browserName.toLowerCase()}-${file}-${theme}.png`);
+        if (path === '/sign-in') {
+          await page.waitForFunction(() => document.querySelector('.login-foot')?.textContent?.includes('v3.0.0 · development'));
+          record((await page.locator('.login-foot').innerText()) === 'NavIC CBTMS v3.0.0 · development', `${browserName} sign-in footer displays v3.0.0 development`);
+        }
+        await saveScreenshot(page, `${browserName.toLowerCase()}-${file}-${theme}-${viewport.width}x${viewport.height}.png`);
       }
-      await page.setViewportSize({ width: 1920, height: 1040 });
+      await page.setViewportSize({ width: 1920, height: 990 });
     }
   }
   if (process.env.SMOKE_REGISTER_FLOW === '1') {
@@ -435,9 +490,11 @@ async function checkAdminDashboard(browser, browserName) {
     ]);
   } else {
     await adminPage.goto(`${baseUrl}/sign-in`, { waitUntil: 'domcontentloaded' });
+    await adminPage.waitForSelector('.login-screen', { timeout: 15000 });
     await adminPage.getByLabel('User ID').fill(adminUserId);
     await adminPage.getByLabel('Password').first().fill(adminPassword);
     await adminPage.getByRole('button', { name: /sign in/i }).click();
+    await adminPage.waitForSelector('#primary-navigation', { timeout: 15000 });
   }
   await adminPage.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
   await adminPage.waitForSelector('#primary-navigation', { timeout: 15000 });
@@ -624,6 +681,14 @@ for (const { name, type } of browsers) {
           record(boundary === 0, `${name} ${theme} ${viewport.width}x${viewport.height} ${route} renders`);
           record(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${name} ${theme} ${viewport.width} ${route} no horizontal scroll`);
           record(await page.locator('#primary-navigation a[aria-current="page"]').count() === 1, `${name} ${route} has one active nav link`);
+          if (route === '/settings') {
+            await page.waitForFunction(() => [...document.querySelectorAll('.kv-row')].some((row) => row.textContent.includes('API version') && row.textContent.includes('3.0.0')));
+            record(true, `${name} Settings displays API version 3.0.0`);
+          }
+          if (route === '/diagnostics') {
+            await page.waitForFunction(() => [...document.querySelectorAll('.diag-item')].some((row) => row.textContent.includes('API version') && row.textContent.includes('3.0.0')));
+            record(true, `${name} Diagnostics displays API version 3.0.0`);
+          }
           await checkShellSingletons(page, `${name} ${theme} ${route} hard load`);
           await checkSearchInputOwnership(page, `${name} ${theme} ${route}`);
           if (theme === 'light') await checkLightBadgeReadability(page, `${name} ${route}`);
@@ -668,8 +733,10 @@ for (const { name, type } of browsers) {
       for (const collapsed of [false, true]) {
         await prepare(page, { width: 1440, height: 900 }, theme, collapsed, '/');
         for (const route of routes) {
-          await page.locator(`#primary-navigation a[href="${route}"]`).click();
+          await page.locator(`#primary-navigation .nav-item[href="${route}"]`).click();
           await page.waitForFunction((expected) => location.pathname.replace(/\/$/, '') === expected.replace(/\/$/, ''), route);
+          // Let the active-bar opacity/transform transition settle before measuring.
+          await page.waitForTimeout(260);
           await inspectSidebar(page, theme, { width: 1440, height: 900 }, collapsed);
           await checkShellSingletons(page, `${name} ${theme} ${route} client navigation`);
         }
@@ -678,6 +745,7 @@ for (const { name, type } of browsers) {
     await checkAuthScreens(browser, name);
     await checkAdminDashboard(browser, name);
     await checkBackendRecovery(browser, name);
+    await checkReportsWithLiveSimulation(browser, name);
 
     await prepare(page, { width: 1440, height: 900 }, 'dark', false, '/');
     await page.evaluate(() => window.scrollTo(0, 520));

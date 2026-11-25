@@ -3397,6 +3397,19 @@ a:hover {
   --sidebar-icon: #334155;
   --sidebar-accent: #075985;
   --sidebar-wash: rgba(14, 116, 144, 0.1);
+  --auth-hero-ink: #0f1720;
+  --auth-hero-muted: #475569;
+  --auth-hero-accent: #0f5f58;
+  --auth-chip-ink: #0f1720;
+  --auth-chip-icon: #0f5f58;
+  --auth-chip-bg: rgba(255, 255, 255, 0.9);
+  --auth-chip-border: rgba(71, 85, 105, 0.72);
+  --auth-card-bg: rgba(255, 255, 255, 0.86);
+  --auth-card-shadow: 0 24px 64px rgba(15, 23, 42, 0.17), inset 0 1px rgba(255, 255, 255, 0.92);
+  --auth-input-border: #64748b;
+  --auth-placeholder: #475569;
+  --auth-focus-ring: rgba(15, 95, 88, 0.65);
+  --auth-ambient: radial-gradient(ellipse 78% 64% at 14% 12%, rgba(45, 212, 191, 0.24), transparent 62%), radial-gradient(ellipse 72% 62% at 86% 82%, rgba(62, 166, 255, 0.22), transparent 62%), repeating-linear-gradient(0deg, rgba(15, 23, 42, 0.025) 0 1px, transparent 1px 42px), repeating-linear-gradient(90deg, rgba(15, 23, 42, 0.025) 0 1px, transparent 1px 42px), var(--bg);
 }
 
 :root[data-theme='dark'] {
@@ -3418,6 +3431,19 @@ a:hover {
   --sidebar-icon: #d4dce8;
   --sidebar-accent: #72c6ff;
   --sidebar-wash: rgba(62, 166, 255, 0.14);
+  --auth-hero-ink: #f8fafc;
+  --auth-hero-muted: #94a3b8;
+  --auth-hero-accent: #5eead4;
+  --auth-chip-ink: #e8eaed;
+  --auth-chip-icon: #72c6ff;
+  --auth-chip-bg: rgba(20, 22, 26, 0.93);
+  --auth-chip-border: rgba(148, 163, 184, 0.72);
+  --auth-card-bg: rgba(20, 22, 26, 0.93);
+  --auth-card-shadow: 0 18px 46px rgba(0, 0, 0, 0.42), inset 0 1px rgba(255, 255, 255, 0.15);
+  --auth-input-border: #66717f;
+  --auth-placeholder: #858d98;
+  --auth-focus-ring: rgba(114, 198, 255, 0.55);
+  --auth-ambient: radial-gradient(ellipse at 18% 18%, color-mix(in srgb, var(--brand, #31a8ff) 18%, transparent), transparent 48%), radial-gradient(ellipse at 82% 82%, color-mix(in srgb, var(--brand, #31a8ff) 12%, transparent), transparent 46%), var(--bg, #f4f6f8);
 }
 
 /* The accent clouds sit behind the app shell; the sidebar is the only large
@@ -5979,11 +6005,39 @@ html { scrollbar-gutter: stable; }
   padding: 32px;
   border: 1px solid var(--glass-border);
   border-radius: 20px;
-  background: var(--glass-bg);
-  box-shadow: var(--glass-shadow), inset 0 1px var(--glass-highlight);
+  background: var(--auth-card-bg);
+  box-shadow: var(--auth-card-shadow);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
   backdrop-filter: blur(18px) saturate(160%);
 }
+.login-copy h1 { color: var(--auth-hero-ink); }
+.login-copy p, .login-foot { color: var(--auth-hero-muted); }
+.login-foot { font-size: 12px; }
+.login-point {
+  border-color: var(--auth-chip-border);
+  background: var(--auth-chip-bg);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08), inset 0 1px var(--glass-highlight);
+  color: var(--auth-chip-ink);
+}
+.login-point svg { color: var(--auth-chip-icon); }
+.login-brand .login-logo { box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12); }
+.login-card .field input,
+.login-card .field select,
+.login-card .field textarea { border-color: var(--auth-input-border); }
+.login-card .field input:focus,
+.login-card .field select:focus,
+.login-card .field textarea:focus {
+  border-color: var(--auth-hero-accent);
+  box-shadow: 0 0 0 3px var(--auth-focus-ring);
+}
+.login-card .field input::placeholder { color: var(--auth-placeholder); opacity: 1; }
+.login-form > .hint { margin-top: -4px; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+/* Light mode uses dark hero ink because the shared ambient field is now light. */
+:root:not([data-theme='dark']) .login-copy h1 em {
+  background: none;
+  color: var(--auth-hero-accent);
+}
+:root:not([data-theme='dark']) .login-brand .login-logo { border-color: var(--auth-input-border); }
 .login-card .field input:-webkit-autofill,
 .login-card .field input:-webkit-autofill:hover,
 .login-card .field input:-webkit-autofill:focus,
@@ -5998,7 +6052,8 @@ html { scrollbar-gutter: stable; }
   .login-card, .login-point { background: var(--sidebar-opaque); }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .login-card, .login-point { background: var(--sidebar-opaque); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .login-card { background: var(--sidebar-opaque); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .login-point { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 @media (max-width: 767px) {
   .login-screen { grid-template-columns: minmax(0, 1fr); align-content: start; }
@@ -6007,7 +6062,7 @@ html { scrollbar-gutter: stable; }
   .login-copy h1 { font-size: clamp(24px, 7vw, 32px); }
   .login-copy p { margin-top: 8px; font-size: 12px; line-height: 1.5; }
   .login-points { display: none; }
-  .login-foot { display: none; }
+  .login-foot { display: block; margin-top: 2px; }
   .login-panel { min-height: 0; padding: 16px; align-items: flex-start; }
   .login-card { width: 100%; max-width: 440px; margin: 0 auto; padding: 24px; }
 }
@@ -6069,8 +6124,8 @@ html { scrollbar-gutter: stable; }
   .sidebar-refreshed, .sidebar.is-drawer-open .sidebar-refreshed { display: none; }
 }
 
-/* One continuous ambient field keeps the auth split layout from reading as two backgrounds. */
-.login-screen { background: radial-gradient(ellipse at 18% 18%, color-mix(in srgb, var(--brand, #31a8ff) 18%, transparent), transparent 48%), radial-gradient(ellipse at 82% 82%, color-mix(in srgb, var(--brand, #31a8ff) 12%, transparent), transparent 46%), var(--bg, #f4f6f8); }
+/* Theme tokens keep one continuous ambient field behind the auth split layout. */
+.login-screen { background: var(--auth-ambient); }
 .login-aside { background: transparent; }
 .backend-offline-banner { position: sticky; top: var(--shell-header-h, 64px); z-index: 20; display: flex; align-items: center; gap: 12px; padding: 10px 24px; color: var(--ink); background: var(--warning-soft, #fef3c7); border-bottom: 1px solid var(--glass-border, rgba(255,255,255,.18)); }
 .backend-offline-banner details { margin-left: auto; }

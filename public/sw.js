@@ -55,7 +55,8 @@ self.addEventListener('fetch', (event) => {
   // Skip API requests - never cache API responses
   if (url.pathname.startsWith('/api/') || 
       url.pathname.startsWith('/auth/') ||
-      url.pathname.startsWith('/ws/')) {
+      url.pathname.startsWith('/ws/') ||
+      url.pathname === '/health') {
     // Let these go to network directly
     return;
   }

@@ -103,7 +103,7 @@ export function SignInForm({
             </button>
           </div>
         </Field>
-        <p className="hint" id="user-id-help" style={{ marginTop: -4 }}>
+        <p className="hint" id="user-id-help">
           Administrators can enter their administrator email address in the User ID field.
         </p>
 

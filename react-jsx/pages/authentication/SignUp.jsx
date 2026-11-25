@@ -2,7 +2,8 @@ import { ShieldCheck, UserRound } from 'lucide-react';
 import { Brand } from '../../components/common/Brand';
 import { SignUpForm } from '../../components/forms';
 
-export function SignUp({ navigate = () => {} }) {
+/** Shared account creation layout; release details come from backend metadata. */
+export function SignUp({ meta, navigate = () => {} }) {
   return (
     <div className="login-screen">
       <aside className="login-aside">
@@ -28,7 +29,7 @@ export function SignUp({ navigate = () => {} }) {
           </div>
         </div>
 
-        <div className="login-foot">NavIC CBTMS · Secure account registration</div>
+        <div className="login-foot">{meta?.application || 'NavIC CBTMS'} v{meta?.version || '—'} · {meta?.environment || 'unknown environment'}</div>
       </aside>
 
       <section className="login-panel">

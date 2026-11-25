@@ -15,7 +15,7 @@ function themeTokens(theme) {
   for (const [, selector, body] of blocks) {
     const isDark = selector.includes("data-theme='dark'") || selector.includes('data-theme="dark"');
     if ((theme === 'dark') !== isDark) continue;
-    for (const [, name, value] of body.matchAll(/(--(?:glass-bg|glass-bg-strong|glass-hover|glass-border|sidebar-text|sidebar-muted|sidebar-icon|sidebar-accent|sidebar-rail-surface|sidebar-count-bg|sidebar-status-(?:online|pending|offline)|ink|brand|danger|menu-danger|topbar-foreground|topbar-icon|topbar-pill-bg|topbar-pill-text|topbar-pill-border|avatar-fill|avatar-ink|success-ink|success-soft|info-ink|info-soft|danger-ink|danger-soft|warning-ink|warning-soft|neutral-ink|neutral-soft|violet-ink|violet-soft|status-(?:on-move|stopped|idle|out-of-network|toing)(?:-ink)?))\s*:\s*([^;]+);/g)) {
+    for (const [, name, value] of body.matchAll(/(--(?:glass-bg|glass-bg-strong|glass-hover|glass-border|sidebar-text|sidebar-muted|sidebar-icon|sidebar-accent|sidebar-rail-surface|sidebar-count-bg|sidebar-status-(?:online|pending|offline)|auth-(?:hero-(?:ink|muted|accent)|chip-(?:ink|icon|bg|border)|card-bg|input-border|placeholder|focus-ring)|ink|brand|danger|menu-danger|topbar-foreground|topbar-icon|topbar-pill-bg|topbar-pill-text|topbar-pill-border|avatar-fill|avatar-ink|success-ink|success-soft|info-ink|info-soft|danger-ink|danger-soft|warning-ink|warning-soft|neutral-ink|neutral-soft|violet-ink|violet-soft|status-(?:on-move|stopped|idle|out-of-network|toing)(?:-ink)?))\s*:\s*([^;]+);/g)) {
       tokens[name] = value.trim();
     }
   }
@@ -104,6 +104,33 @@ for (const [theme, value] of Object.entries(tokens)) {
   const authIconPass = authIconRatio >= 3;
   console.log(`${authIconPass ? 'PASS' : 'FAIL'} ${theme} auth glass icon: ${authIconRatio.toFixed(2)}:1 (required 3:1)`);
   if (!authIconPass) failures += 1;
+  const authToken = (key) => parseColor(value[`--auth-${key}`]);
+  const authCardSurfaces = backdrops.map((backdrop) => composite(authToken('card-bg'), backdrop));
+  const authChipSurfaces = backdrops.map((backdrop) => composite(authToken('chip-bg'), backdrop));
+  const authForegroundChecks = [
+    ['auth hero heading', authToken('hero-ink'), backdrops, 4.5],
+    ['auth hero paragraph/footer', authToken('hero-muted'), backdrops, 4.5],
+    ['auth highlighted heading', authToken('hero-accent'), backdrops, 4.5],
+    ['auth feature chip text', authToken('chip-ink'), authChipSurfaces, 4.5],
+    ['auth feature chip icon', authToken('chip-icon'), authChipSurfaces, 3],
+    ['auth input placeholder', authToken('placeholder'), authCardSurfaces, 4.5],
+  ];
+  for (const [label, foreground, surfaces, minimum] of authForegroundChecks) {
+    const ratio = Math.min(...surfaces.map((surface) => contrast(opaqueRgb(foreground), surface)));
+    const pass = ratio >= minimum;
+    console.log(`${pass ? 'PASS' : 'FAIL'} ${theme} ${label}: ${ratio.toFixed(2)}:1 (required ${minimum}:1)`);
+    if (!pass) failures += 1;
+  }
+  const authInputBorder = opaqueRgb(authToken('input-border'));
+  const authBorderRatio = Math.min(...authCardSurfaces.map((surface) => contrast(authInputBorder, surface)));
+  const authBorderPass = authBorderRatio >= 3;
+  console.log(`${authBorderPass ? 'PASS' : 'FAIL'} ${theme} auth input border: ${authBorderRatio.toFixed(2)}:1 (required 3:1)`);
+  if (!authBorderPass) failures += 1;
+  const focus = authToken('focus-ring');
+  const focusRatio = Math.min(...authCardSurfaces.map((surface) => contrast(composite(focus, surface), surface)));
+  const focusPass = focusRatio >= 3;
+  console.log(`${focusPass ? 'PASS' : 'FAIL'} ${theme} auth focus ring: ${focusRatio.toFixed(2)}:1 (required 3:1)`);
+  if (!focusPass) failures += 1;
   const foregrounds = [
     ['body text', opaqueRgb(parseColor(value['--sidebar-text'])), 4.5],
     ['section label', opaqueRgb(parseColor(value['--sidebar-muted'])), 4.5],
