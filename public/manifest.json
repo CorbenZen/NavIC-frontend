@@ -1,6 +1,6 @@
 {
   "name": "CBTMS NavIC",
-  "short_name": "NavIC",
+  "short_name": "CBTMS",
   "description": "College Bus Tracking and Management System",
   "start_url": "/",
   "display": "standalone",
