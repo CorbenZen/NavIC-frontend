@@ -135,7 +135,8 @@ export function FleetDashboard({ navigate }) {
       <div className="fleet-status-filters" role="group" aria-label="Filter vehicles by status">
         {STATUS_FILTERS.map(([key, label, countKey]) => {
           const count = key === 'all' ? vehicleStats?.all : vehicleStats?.[countKey];
-          return <button key={key} type="button" className={`fleet-status-filter ${key} ${statusFilter === key ? 'selected' : ''}`} aria-pressed={statusFilter === key} onClick={() => { setPage(0); setStatusFilter(key); }}>
+          const empty = key !== 'all' && Number(count) === 0;
+          return <button key={key} type="button" className={`fleet-status-filter ${key} ${statusFilter === key ? 'selected' : ''} ${empty ? 'empty' : ''}`} aria-pressed={statusFilter === key} onClick={() => { setPage(0); setStatusFilter(key); }}>
             <span>{label}</span><b>{Number.isFinite(Number(count)) ? count : '—'}</b>
           </button>;
         })}

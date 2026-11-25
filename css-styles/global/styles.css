@@ -3971,22 +3971,25 @@ body.sidebar-scroll-locked { overflow: hidden; }
 .fleet-dashboard { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(280px, .82fr); align-items: start; gap: 16px; margin: 0 0 18px; }
 .fleet-dashboard-main { display: grid; min-width: 0; gap: 12px; }
 .fleet-status-filters { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
-.fleet-status-filter { --status-color: var(--status-out-of-network); min-width: 0; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 11px; border: 1px solid color-mix(in srgb, var(--status-color) 58%, transparent); border-radius: 18px; background: color-mix(in srgb, var(--status-color) 9%, var(--chip-surface)); color: var(--ink); font: 700 9px var(--font-body); cursor: pointer; transition: background .16s ease, border-color .16s ease, box-shadow .16s ease; }
+.fleet-status-filter { --status-color: var(--status-out-of-network); --status-ink: var(--status-out-of-network-ink); min-width: 0; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 11px; border: 1px solid color-mix(in srgb, var(--status-color) 45%, transparent); border-radius: 18px; background: color-mix(in srgb, var(--status-color) 14%, transparent); color: var(--status-ink, var(--ink)); font: 700 9px var(--font-body); cursor: pointer; transition: background .16s ease, border-color .16s ease, box-shadow .16s ease, opacity .16s ease; }
 .fleet-status-filter b { display: grid; flex: 0 0 34px; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: var(--status-color); color: #fff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45); font-size: 12px; }
-/* Green and blue need darker in-family digits for clear contrast on their bright fills. */
 .fleet-status-filter.on_move b { color: #052e16; }
 .fleet-status-filter.idle b { color: #082f49; }
-.fleet-status-filter:hover { background: color-mix(in srgb, var(--status-color) 18%, var(--chip-hover-surface)); }
-.fleet-status-filter.all { --status-color: var(--status-all); }
+.fleet-status-filter:hover { background: color-mix(in srgb, var(--status-color) 24%, transparent); opacity: 1; }
+.fleet-status-filter.all { --status-color: var(--status-all); --status-ink: var(--status-all); }
 .fleet-status-filter:not(.all) > span::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--status-color); vertical-align: 1px; }
-.fleet-status-filter.all:not(.selected) { background: var(--surface); border-color: var(--status-all); color: var(--status-all); }
-.fleet-status-filter.on_move { --status-color: var(--status-on-move); }
-.fleet-status-filter.stopped { --status-color: var(--status-stopped); }
-.fleet-status-filter.idle { --status-color: var(--status-idle); }
-.fleet-status-filter.out_of_network { --status-color: var(--status-out-of-network); }
-.fleet-status-filter.toing { --status-color: var(--status-toing); }
-.fleet-status-filter.selected { border-color: var(--status-color); box-shadow: 0 0 0 1px var(--status-color), 0 0 12px color-mix(in srgb, var(--status-color) 35%, transparent); }
-.fleet-status-filter.all.selected { background: var(--status-all); color: #fff; }
+.fleet-status-filter.on_move { --status-color: var(--status-on-move); --status-ink: var(--status-on-move-ink); }
+.fleet-status-filter.stopped { --status-color: var(--status-stopped); --status-ink: var(--status-stopped-ink); }
+.fleet-status-filter.idle { --status-color: var(--status-idle); --status-ink: var(--status-idle-ink); }
+.fleet-status-filter.out_of_network { --status-color: var(--status-out-of-network); --status-ink: var(--status-out-of-network-ink); }
+.fleet-status-filter.toing { --status-color: var(--status-toing); --status-ink: var(--status-toing-ink); }
+.fleet-status-filter.empty:not(.selected) { opacity: .55; }
+.fleet-status-filter.selected { background: var(--status-color); border-color: var(--status-color); color: #fff; box-shadow: 0 0 0 1px var(--status-color); }
+.fleet-status-filter.selected b { background: rgba(255, 255, 255, 0.24); color: inherit; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5); }
+.fleet-status-filter.selected > span::before { background: currentColor; }
+.fleet-status-filter.selected.on_move { color: #052e16; }
+.fleet-status-filter.selected.idle { color: #082f49; }
+.fleet-status-filter.selected.on_move b, .fleet-status-filter.selected.idle b { background: rgba(255, 255, 255, 0.35); }
 .fleet-table-card { min-width: 0; overflow: hidden; }
 .fleet-table-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
 .fleet-table-heading h2 { font-size: 14px; }.fleet-table-heading p { margin-top: 3px; color: var(--muted); font-size: 10px; }
