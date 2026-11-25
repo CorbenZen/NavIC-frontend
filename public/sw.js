@@ -3,7 +3,9 @@
  * Caches app shell only - NO API responses or WebSocket data
  */
 
-const CACHE_NAME = 'navic-cbtms-v3-shell';
+// Bump this name whenever caching behaviour changes: activate() deletes every
+// other cache, so devices drop pages saved by older service workers.
+const CACHE_NAME = 'navic-cbtms-v4-shell';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -66,17 +68,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // For navigation requests, try cache first then network
+  // Navigation requests: network first so every deploy reaches devices at
+  // once; the saved app shell is only a fallback when the network fails.
+  // (Cache-first here kept serving the first-ever index.html, and with it the
+  // old JavaScript bundle, to returning phones indefinitely.)
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        return cachedResponse || fetch(event.request).catch(() => {
-          // If both cache and network fail, show offline page
-          return caches.match('/offline.html').then((offlineResponse) => {
-            return offlineResponse || new Response('Offline', { status: 503 });
-          });
-        });
-      })
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse.ok) {
+            const shellCopy = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put('/', shellCopy));
+          }
+          return networkResponse;
+        })
+        .catch(() =>
+          caches.match(event.request)
+            .then((cached) => cached || caches.match('/'))
+            .then((cached) => cached || caches.match('/offline.html'))
+            .then((cached) => cached || new Response('Offline', { status: 503 }))
+        )
     );
     return;
   }
